@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>温馨提示（无限循环）</title>
+<title>hi 你好:)</title>
 <style>
   body {
     margin: 0;
     overflow: hidden;
-    background-color: #fffaf0;
     font-family: "微软雅黑", sans-serif;
+    transition: background-color 2s ease;
   }
+
   .popup {
     position: absolute;
     width: 600px;
@@ -24,6 +25,8 @@
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     animation: fadeInOut 3s ease forwards;
+    text-align: center;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.2);
   }
 
   @keyframes fadeInOut {
@@ -32,9 +35,38 @@
     90% { opacity: 1; transform: scale(1.0); }
     100% { opacity: 0; transform: scale(0.8); }
   }
+
+  /* 圆形浮窗按钮 */
+  #musicControl {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 100px;
+    height: 100px;
+    background-color: #FFCC99;
+    border-radius: 50%;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    z-index: 9999;
+    font-size: 36px;
+  }
+
+  #musicControl span {
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
+
+<div id="musicControl"><span>▶</span></div>
+<audio id="bgMusic" loop src="http://music.163.com/song/media/outer/url?id=431791474.mp3" autoplay muted></audio>
 
 <script>
 const messages = [
@@ -54,29 +86,71 @@ const warmColors = [
 
 let count = 0;
 
+// 无限循环弹窗 + 背景渐变
 function showPopup() {
   const popup = document.createElement('div');
   popup.className = 'popup';
   popup.textContent = messages[count % messages.length];
-  popup.style.backgroundColor = warmColors[count % warmColors.length];
+  const bgColor = warmColors[count % warmColors.length];
+  popup.style.backgroundColor = bgColor;
 
-  // 随机位置
+  document.body.style.backgroundColor = bgColor;
+
   const x = Math.random() * (window.innerWidth - 600);
   const y = Math.random() * (window.innerHeight - 200);
   popup.style.left = `${x}px`;
   popup.style.top = `${y}px`;
 
   document.body.appendChild(popup);
-  setTimeout(() => popup.remove(), 3000); // 3秒后消失
+  setTimeout(() => popup.remove(), 3000);
 
   count++;
-
-  // 100ms 后再弹出下一个
   setTimeout(showPopup, 100);
 }
-
-// 无限循环启动
 showPopup();
+
+// 背景音乐控制
+const bgMusic = document.getElementById('bgMusic');
+const musicControl = document.getElementById('musicControl');
+const icon = musicControl.querySelector('span');
+let isPlaying = false;
+
+// 首次点击解除静音并尝试播放
+function initMusic() {
+  bgMusic.muted = false;
+  bgMusic.play().catch(()=>{});
+  document.body.removeEventListener('click', initMusic);
+}
+document.body.addEventListener('click', initMusic);
+
+// 控制按钮点击
+musicControl.addEventListener('click', () => {
+  if(isPlaying){
+    bgMusic.pause();
+    icon.textContent = '▶';
+  }else{
+    bgMusic.play();
+    icon.textContent = '⏸';
+  }
+  isPlaying = !isPlaying;
+});
+
+// 可拖拽浮窗
+let offsetX = 0, offsetY = 0, isDragging = false;
+musicControl.addEventListener('mousedown', e => {
+  isDragging = true;
+  offsetX = e.clientX - musicControl.offsetLeft;
+  offsetY = e.clientY - musicControl.offsetTop;
+});
+document.addEventListener('mousemove', e => {
+  if(isDragging){
+    musicControl.style.left = (e.clientX - offsetX) + 'px';
+    musicControl.style.top = (e.clientY - offsetY) + 'px';
+  }
+});
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+});
 </script>
 
 </body>
