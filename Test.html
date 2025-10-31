@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>温馨提示（无限循环）</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #fffaf0;
+    font-family: "微软雅黑", sans-serif;
+  }
+  .popup {
+    position: absolute;
+    width: 600px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: #333;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    animation: fadeInOut 3s ease forwards;
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: scale(0.8); }
+    10% { opacity: 1; transform: scale(1.05); }
+    90% { opacity: 1; transform: scale(1.0); }
+    100% { opacity: 0; transform: scale(0.8); }
+  }
+</style>
+</head>
+<body>
+
+<script>
+const messages = [
+  "早安，开启美好一天！","温暖的阳光洒满房间。","愿你今天心情愉快。",
+  "生活充满希望。","微笑面对每一天。","努力就有收获。","幸福其实很简单。",
+  "相信自己，勇敢前行。","温柔以待世界。","感受生活的美好。","今天也要加油哦！",
+  "阳光总在风雨后。","遇见更好的自己。","心怀感恩，快乐常在。",
+  "愿你被世界温柔以待。","梦想照进现实。","每一天都是新的开始。",
+  "保持热爱，奔赴山海。","生活因你而美丽。","愿你笑容常在。"
+];
+
+const warmColors = [
+  "#FFEFD5","#FFE4B4","#FFDEAD","#FFB6C1","#FFCC99","#FFFACD","#FFF5EE","#FFE4E1",
+  "#FFDAB9","#FFA07A","#FFEC8B","#FFD7B4","#FFDFD3","#FFF0F5","#FFFAF0","#FFEFDD",
+  "#FFE4B5","#FFC0CB","#FFE4E1"
+];
+
+let count = 0;
+
+function showPopup() {
+  const popup = document.createElement('div');
+  popup.className = 'popup';
+  popup.textContent = messages[count % messages.length];
+  popup.style.backgroundColor = warmColors[count % warmColors.length];
+
+  // 随机位置
+  const x = Math.random() * (window.innerWidth - 600);
+  const y = Math.random() * (window.innerHeight - 200);
+  popup.style.left = `${x}px`;
+  popup.style.top = `${y}px`;
+
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 3000); // 3秒后消失
+
+  count++;
+
+  // 100ms 后再弹出下一个
+  setTimeout(showPopup, 100);
+}
+
+// 无限循环启动
+showPopup();
+</script>
+
+</body>
+</html>
